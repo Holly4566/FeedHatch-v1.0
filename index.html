@@ -287,14 +287,29 @@ body::before {
   border-left: 3px solid var(--accent2);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   min-height: 60px;
-  max-height: 20000000000px;
+  max-height: 220px;
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
 }
 .feeding-card .feed-meta { font-size: 12px; color: var(--text-light); margin-bottom: 14px; }
-.feeding-card .feed-actions { display: flex; gap: 10px; margin-top: 40px; }
-.feeding-card .feed-actions .btn { flex: 1; }
+.feed-tool-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0 12px; }
+.feed-tool-btn {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card2);
+  color: var(--text-light);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.feed-tool-btn:hover { color: var(--accent); border-color: var(--accent); }
+.feed-main-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+.feed-primary-action { width: 100%; white-space: nowrap; }
+.feed-skip-action { align-self: center; padding: 6px 12px; min-height: 34px; font-size: 13px; white-space: nowrap; }
 
 .feeding-empty {
   text-align: center;
@@ -589,7 +604,7 @@ body::before {
   width: 100%;
   height: 100%;
   transform: rotateY(180deg);
-  padding: 40px 30px;
+  padding: 32px 24px;
   box-sizing: border-box;
 }
 
@@ -621,7 +636,7 @@ body::before {
 .hatch-egg.cracking { animation: crackBounce 0.5s; }
 
 .hatch-creature {
-  font-size: 100px;
+  font-size: 90px;
   display: block;
   animation: creatureReveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -643,20 +658,38 @@ body::before {
 .hatch-name {
   font-size: 24px;
   font-weight: 800;
-  margin: 4px 0;
+  margin: 2px 0;
   animation: slideUp 0.4s 0.3s both;
   color: var(--accent);
 }
 .hatch-desc {
   font-size: 13px;
   color: var(--text-light);
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   animation: slideUp 0.4s 0.4s both;
+}
+.hatch-comment {
+  font-size: 12px;
+  color: var(--text);
+  background: var(--card2);
+  border-radius: 10px;
+  padding: 6px 8px;
+  margin: 0 8px 8px;
+  line-height: 1.45;
+  animation: slideUp 0.4s 0.45s both;
 }
 .hatch-repeat {
   font-size: 12px;
   color: #999;
-  margin-top: 8px;
+  display: inline-block;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--card2);
+  line-height: 1.4;
+  white-space: normal;
+  word-break: break-word;
+  margin-top: 2px;
   animation: slideUp 0.4s 0.5s both;
 }
 .hatch-btn {
@@ -1057,8 +1090,10 @@ body::before {
   .feeding-card .feed-title { font-size: 16px; }
   .feeding-card .feed-content { font-size: 12px; padding: 8px 10px; max-height: 160px; }
   .feeding-card .feed-url { font-size: 10px; padding: 6px 8px; }
-  .feeding-card .feed-actions { flex-direction: column; gap: 8px; }
-  .feeding-card .feed-actions .btn { width: 100%; }
+  .feed-tool-actions { justify-content: flex-end; gap: 6px; }
+  .feed-tool-btn { padding: 5px 8px; min-height: 30px; font-size: 11px; }
+  .feed-main-actions { gap: 8px; }
+  .feed-primary-action, .feed-skip-action { white-space: nowrap; }
   .ci-copy-btns { gap: 4px; }
   .btn-copy-sm { padding: 4px 8px; min-height: 30px; font-size: 10px; }
 
@@ -1079,9 +1114,11 @@ body::before {
   .hatch-box-wrapper { max-width: 280px; }
   .hatch-box { padding: 30px 20px; }
   .hatch-box-front, .hatch-box-back { min-height: 260px; }
+  .hatch-box-back { padding: 28px 18px; }
   .hatch-egg { font-size: 60px; }
-  .hatch-creature { font-size: 80px; }
+  .hatch-creature { font-size: 76px; }
   .hatch-name { font-size: 20px; }
+  .hatch-comment { font-size: 12px; }
 
   .modal-sheet { padding: 16px 12px 24px; max-height: 80vh; }
   .modal-sheet h3 { font-size: 15px; }
@@ -1281,7 +1318,7 @@ body::before {
         <span class="platform-tag xhs" data-platform="xhs">📕小红书</span>
         <span class="platform-tag other selected" data-platform="other"> 其他</span>
       </div>
-      <button class="btn btn-primary btn-full" id="btnAdd">📥</button>
+      <button class="btn btn-primary btn-full" id="btnAdd">📥 加入粮仓</button>
     </div>
   </div>
 
@@ -1310,6 +1347,19 @@ body::before {
     <div class="card-title">
       🛖 我的粮仓
       <span style="font-size:12px;color:var(--text-light);margin-left:auto;" id="listCount"></span>
+      <button type="button" id="btnExportBackup" style="
+        background:none;border:1px solid var(--border);color:var(--text-light);font-size:12px;
+        cursor:pointer;padding:4px 8px;border-radius:6px;margin-left:8px;
+        font-family:inherit;transition:all 0.15s;
+        display:inline-flex;align-items:center;gap:4px;
+      " onmouseover="this.style.color='var(--accent)';this.style.background='var(--card2)'" onmouseout="this.style.color='var(--text-light)';this.style.background='none'">导出备份</button>
+      <button type="button" id="btnImportBackup" style="
+        background:none;border:1px solid var(--border);color:var(--text-light);font-size:12px;
+        cursor:pointer;padding:4px 8px;border-radius:6px;margin-left:4px;
+        font-family:inherit;transition:all 0.15s;
+        display:inline-flex;align-items:center;gap:4px;
+      " onmouseover="this.style.color='var(--accent)';this.style.background='var(--card2)'" onmouseout="this.style.color='var(--text-light)';this.style.background='none'">导入备份</button>
+      <input type="file" id="backupFileInput" accept="application/json,.json" style="display:none;">
       <button onclick="handleClearAll()" style="
         background:none;border:none;color:var(--text-light);font-size:12px;
         cursor:pointer;padding:4px 8px;border-radius:6px;margin-left:8px;
@@ -1372,6 +1422,7 @@ body::before {
         <div class="hatch-rarity-badge" id="hatchRarity" style="display:none;"></div>
         <div class="hatch-name" id="hatchName" style="display:none;"></div>
         <div class="hatch-desc" id="hatchDesc" style="display:none;"></div>
+        <div class="hatch-comment" id="hatchComment" style="display:none;"></div>
         <div class="hatch-repeat" id="hatchRepeat" style="display:none;"></div>
       </div>
     </div>
@@ -1649,9 +1700,7 @@ function showToast(msg) {
 }
 
 function copyToClipboard(text, msg = '🔗 链接已复制！') {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => showToast(msg));
-  } else {
+  const fallbackCopy = () => {
     const ta = document.createElement('textarea');
     ta.value = text;
     ta.style.position = 'fixed';
@@ -1661,6 +1710,48 @@ function copyToClipboard(text, msg = '🔗 链接已复制！') {
     document.execCommand('copy');
     document.body.removeChild(ta);
     showToast(msg);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
+}
+
+function normalizeUrl(rawUrl) {
+  const raw = typeof rawUrl === 'string' ? rawUrl.trim() : '';
+  if (!raw) return '';
+
+  let candidate = '';
+  const httpMatch = raw.match(/https?:\/\/[^\s"'`<>\u3000]+/i);
+  if (httpMatch) {
+    candidate = httpMatch[0];
+  } else if (/^www\./i.test(raw)) {
+    candidate = 'https://' + raw.split(/\s/)[0];
+  }
+
+  if (!candidate) return '';
+  candidate = candidate.replace(/[，。！？、；：）】》」』\]\)]+$/g, '');
+
+  try {
+    const url = new URL(candidate);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+    return url.href;
+  } catch (e) {
+    return '';
+  }
+}
+
+function openFeedUrl(feedId) {
+  const item = state.collections.find(c => c.id === feedId);
+  const url = normalizeUrl(item && item.url);
+  if (!url) {
+    showToast('⚠️ 链接格式不正确，请复制后手动检查');
+    return;
+  }
+  const opened = window.open(url, '_blank', 'noopener');
+  if (!opened) {
+    copyToClipboard(url, '🔗 链接已复制，请手动打开');
   }
 }
 
@@ -1831,6 +1922,115 @@ function hatchCreature() {
   };
 }
 
+function generateFeedComment(item, creature) {
+  const safeItem = item && typeof item === 'object' ? item : {};
+  const safeCreature = creature && typeof creature === 'object' ? creature : {};
+  const platform = typeof safeItem.platform === 'string' ? safeItem.platform : 'other';
+  const title = typeof safeItem.title === 'string' ? safeItem.title.trim() : '';
+  const content = typeof safeItem.content === 'string' ? safeItem.content : '';
+  const addedAt = typeof safeItem.addedAt === 'string' ? safeItem.addedAt : '';
+  const addedDate = addedAt ? addedAt.split('T')[0] : todayStr();
+  const rawAgeDays = /^\d{4}-\d{2}-\d{2}$/.test(addedDate) ? daysAgo(addedDate) : 0;
+  const ageDays = Number.isFinite(rawAgeDays) ? Math.max(0, rawAgeDays) : 0;
+  const platformName = ({ bilibili: 'B站', douyin: '抖音', gzh: '公众号', xhs: '小红书', other: '普通' })[platform] || '普通';
+  const creatureName = typeof safeCreature.name === 'string' && safeCreature.name.trim() ? safeCreature.name.trim() : '新朋友';
+
+  let titleHint = '标题选择了保持神秘';
+  if (title.length > 34) titleHint = '标题长得像一篇小论文';
+  else if (/[?？!！]/.test(title)) titleHint = '标题情绪挺足';
+  else if (title.length > 0) titleHint = '标题看起来有点东西';
+
+  let contentHint = '正文空空，但仪式感有了';
+  if (content.length >= 300) contentHint = '正文够它慢慢啃';
+  else if (content.length >= 80) contentHint = '正文有点料';
+  else if (content.length > 0) contentHint = '内容不长，适合速食';
+
+  const pick = list => list[Math.floor(Math.random() * list.length)];
+  const titleMood = ({
+    '标题选择了保持神秘': '挺神秘',
+    '标题长得像一篇小论文': '像小论文',
+    '标题情绪挺足': '情绪挺足',
+    '标题看起来有点东西': '有点东西'
+  })[titleHint] || titleHint;
+  const contentMood = ({
+    '正文空空，但仪式感有了': '正文空空，仪式感有了',
+    '正文够它慢慢啃': '够嚼',
+    '正文有点料': '有点料',
+    '内容不长，适合速食': '刚好一口吞'
+  })[contentHint] || contentHint;
+
+  let ageLines;
+  if (ageDays >= 14) {
+    ageLines = [
+      `这条${platformName}像在考古，${creatureName}嚼得很认真`,
+      `等了 ${ageDays} 天，${creatureName}吃出老租客味`,
+      `${creatureName}啃完老收藏，觉得自己像考古队`,
+      `这份陈年收藏见光，${creatureName}松了口气`,
+      `这条${platformName}差点长期居住，今天终于退房`
+    ];
+  } else if (ageDays >= 7) {
+    ageLines = [
+      `放了 ${ageDays} 天，${creatureName}说这口有点复古`,
+      `这条${platformName}快发芽了，今天终于见光`,
+      `${creatureName}接过陈年存货，表情很努力`,
+      `这口收藏等了一周多，终于被安排`,
+      `这条${platformName}排队太久，差点住下`
+    ];
+  } else if (ageDays >= 3) {
+    ageLines = [
+      `等了 ${ageDays} 天，${creatureName}终于把它翻出来`,
+      `这条${platformName}蹲了 ${ageDays} 天，总算开饭`,
+      `${creatureName}翻出旧收藏，灰都快有节奏`,
+      `拖了 ${ageDays} 天，${creatureName}没有多问`,
+      `这口${platformName}等到今天，脾气还算稳定`
+    ];
+  } else {
+    ageLines = [
+      `${creatureName}表示：这条${platformName}${contentMood}`,
+      `这条${platformName}还没捂热，${creatureName}就开嚼`,
+      `新鲜收藏上桌，${creatureName}吃得有仪式感`,
+      `${creatureName}说：这口${platformName}来得正好`,
+      `这条${platformName}刚进粮仓，${creatureName}已经动筷`
+    ];
+  }
+
+  const platformLines = {
+    bilibili: ['弹幕味挺足', '够当精神夜宵', '视频感有点上头'],
+    douyin: ['短归短，有后劲', '刷到不算，嚼完才算', '差点又被划走'],
+    gzh: ['像顿正餐', '有点东西，够嚼', '长文气质还在'],
+    xhs: ['有点会种草', '笔记味很足', '看完有点动摇'],
+    other: ['来源低调，口感还行', '普通但不敷衍', '能消化就是好粮']
+  };
+  const titleLines = [
+    `标题${titleMood}`,
+    `看标题就${titleMood}`,
+    `开头就${titleMood}`
+  ];
+  const contentLines = [
+    contentMood,
+    `内容${contentMood}`,
+    `这口${contentMood}`
+  ];
+  const creatureLines = [
+    '它点了点头',
+    '这口不算亏',
+    '小生物给了个小赞',
+    '算是没白忙'
+  ];
+
+  const base = pick(ageLines);
+  const tail = pick([
+    pick(platformLines[platform] || platformLines.other),
+    pick(titleLines),
+    pick(contentLines),
+    pick(creatureLines)
+  ]);
+  const withTail = `${base}，${tail}。`;
+  const plain = `${base}。`;
+  if (plain.length < 18 && withTail.length <= 45) return withTail;
+  return withTail.length <= 45 && Math.random() < 0.6 ? withTail : plain;
+}
+
 // ==================== FEEDING LOGIC ====================
 function getUndigested() {
   return state.collections.filter(c => !c.digested);
@@ -1860,6 +2060,7 @@ function pickTodayFeed() {
     state.todayFeedId = oldFeedId;
     state.todayFeedDate = oldFeedDate;
     state.skipsUsedToday = oldSkips;
+    return null;
   }
   return pick;
 }
@@ -1871,7 +2072,7 @@ function getTodayFeed() {
   return state.collections.find(c => c.id === state.todayFeedId) || pickTodayFeed();
 }
 
-function digestItem(id) {
+function digestItem(id, digestNote = '') {
   if (!id) return null;
   const item = state.collections.find(c => c.id === id);
   if (!item || item.digested) return null;
@@ -1879,6 +2080,8 @@ function digestItem(id) {
   // 保存旧状态用于回滚
   const oldDigested = item.digested;
   const oldDigestedAt = item.digestedAt;
+  const oldHasDigestNote = Object.prototype.hasOwnProperty.call(item, 'digestNote');
+  const oldDigestNote = item.digestNote;
   const oldStreak = state.streak;
   const oldLastDigestDate = state.lastDigestDate;
   const oldMaxStreak = state.maxStreak;
@@ -1889,6 +2092,11 @@ function digestItem(id) {
 
   item.digested = true;
   item.digestedAt = new Date().toISOString();
+  if (typeof digestNote === 'string' && digestNote.trim()) {
+    item.digestNote = digestNote.trim();
+  } else {
+    delete item.digestNote;
+  }
 
   const today = todayStr();
   const yesterday = daysAgoToDateStr(1);
@@ -1919,6 +2127,7 @@ function digestItem(id) {
   if (state.streak > state.maxStreak) state.maxStreak = state.streak;
 
   const creature = hatchCreature();
+  creature.comment = generateFeedComment(item, creature);
 
   // 判断是否重复
   const isDuplicate = state.creatures.some(c => c.key === creature.key);
@@ -1935,6 +2144,8 @@ function digestItem(id) {
     // 回滚
     item.digested = oldDigested;
     item.digestedAt = oldDigestedAt;
+    if (oldHasDigestNote) item.digestNote = oldDigestNote;
+    else delete item.digestNote;
     state.streak = oldStreak;
     state.lastDigestDate = oldLastDigestDate;
     state.maxStreak = oldMaxStreak;
@@ -2027,20 +2238,22 @@ function renderFeeding() {
     <div class="feed-title">${escapeHtml(feed.title)}</div>
     ${feed.url ? `<div class="feed-url" onclick="copyToClipboard('${escapeAttr(feed.url)}')" title="点击复制链接">🔗 ${escapeHtml(feed.url)}</div>` : ''}
     ${feed.content ? `<div class="feed-content">${escapeHtml(feed.content)}</div>` : ''}
+    ${(feed.url || feed.content) ? `
+      <div class="feed-tool-actions">
+        ${feed.url ? `<button class="feed-tool-btn" onclick="openFeedUrl('${feed.id}')">🔗 打开</button>` : ''}
+        ${feed.url ? `<button class="feed-tool-btn" onclick="event.stopPropagation();copyToClipboard('${escapeAttr(feed.url)}')" title="复制链接">🔗 复制</button>` : ''}
+        ${feed.content ? `<button class="feed-tool-btn" onclick="event.stopPropagation();copyToClipboard('${escapeAttr(feed.content)}', '📋 正文已复制！')" title="复制正文">📋 复制</button>` : ''}
+        ${feed.content ? `<button class="feed-tool-btn" onclick="event.stopPropagation();showFullContent('${feed.id}')" title="显示全文">📖 全文</button>` : ''}
+      </div>` : ''}
     <div class="feed-meta">
       🕐 收藏于 ${daysSince} 天前
       ${state.skipsUsedToday > 0 ? `· 今日已换 ${state.skipsUsedToday}/3 次` : ''}
     </div>
-    <div class="ci-copy-btns">
-      ${feed.url ? `<button class="btn-copy-sm" onclick="event.stopPropagation();copyToClipboard('${escapeAttr(feed.url)}')" title="复制链接">🔗</button>` : ''}
-      ${feed.content ? `<button class="btn-copy-sm" onclick="event.stopPropagation();copyToClipboard('${escapeAttr(feed.content)}', '📋 正文已复制！')" title="复制正文">📋</button>` : ''}
-      ${feed.content ? `<button class="btn-copy-sm" onclick="event.stopPropagation();showFullContent('${feed.id}')" title="显示全文">📖全文</button>` : ''}
-    </div>
-    <div class="feed-actions">
-      <button class="btn btn-primary" id="btnDigest" onclick="handleDigest('${feed.id}')">
-        ✅ 我消化完了！
+    <div class="feed-main-actions">
+      <button class="btn btn-primary feed-primary-action" id="btnDigest" onclick="handleDigest('${feed.id}')">
+        ✅ 已吸收，开孵！
       </button>
-      <button class="btn btn-ghost" id="btnSkip" onclick="handleSkip()">
+      <button class="btn btn-ghost feed-skip-action" id="btnSkip" onclick="handleSkip()">
         🔄 换一条
       </button>
     </div>`;
@@ -2090,6 +2303,7 @@ function renderCollectionList() {
   list.innerHTML = all.map(c => {
     const platform = c.platform || 'other';
     const daysSince = daysAgo(c.addedAt.split('T')[0]);
+    const digestNote = typeof c.digestNote === 'string' ? c.digestNote.trim() : '';
     return `
       <div class="collection-item ${c.digested ? 'digested' : ''}" onclick="openDetail('${c.id}')" style="cursor:pointer;">
         <span class="ci-platform ${platform}">${getPlatformName(platform)}</span>
@@ -2097,6 +2311,7 @@ function renderCollectionList() {
           <div class="ci-title">${c.url ? `<a href="${escapeAttr(c.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none;">${escapeHtml(c.title)}</a>` : escapeHtml(c.title)}</div>
           ${c.url ? `<div class="ci-url"> ${escapeHtml(c.url)}</div>` : ''}
           ${c.content ? `<div class="ci-content-preview">📝 ${escapeHtml(c.content.slice(0, 50))}${c.content.length > 50 ? '...' : ''}</div>` : ''}
+          ${digestNote ? `<div class="ci-content-preview">💡 我的消化：${escapeHtml(digestNote)}</div>` : ''}
           <div class="ci-meta">
             ${c.digested ? `✅ 已消化 · ${daysAgo(c.digestedAt.split('T')[0])} 天前` : `⏳ 待消化 · ${daysSince} 天前收藏`}
           </div>
@@ -2105,7 +2320,7 @@ function renderCollectionList() {
             ${c.content ? `<button class="btn-copy-sm" onclick="event.stopPropagation();copyToClipboard('${escapeAttr(c.content)}', '📋 正文已复制！')" title="复制正文">📋</button>` : ''}
           </div>
         </div>
-        <button class="btn btn-ghost" onclick="deleteCollection('${c.id}')" style="padding:2px 6px;font-size:16px;" title="删除">🗑️</button>
+        <button class="btn btn-ghost" onclick="event.stopPropagation();deleteCollection('${c.id}')" style="padding:2px 6px;font-size:16px;" title="删除">🗑️</button>
       </div>`;
   }).join('');
 }
@@ -2119,6 +2334,7 @@ function openDetail(id) {
   const digestInfo = c.digested
     ? `✅ 已消化 · ${daysAgo(c.digestedAt.split('T')[0])} 天前`
     : `⏳ 待消化 · ${daysSince} 天前收藏`;
+  const digestNote = typeof c.digestNote === 'string' ? c.digestNote.trim() : '';
 
   document.getElementById('detailContent').innerHTML = `
     <div style="margin-bottom:12px;">
@@ -2133,13 +2349,18 @@ function openDetail(id) {
       ? `<div class="detail-url"> <a href="${escapeAttr(c.url)}" target="_blank" rel="noopener">${escapeHtml(c.url)}</a></div>`
       : ''}
     <div class="detail-meta">${digestInfo}</div>
+    ${digestNote
+      ? `<div class="detail-content" style="background:var(--card2);font-size:13px;margin-bottom:12px;">💡 我的消化：${escapeHtml(digestNote)}</div>`
+      : ''}
     ${c.content
       ? `<div class="detail-content">${escapeHtml(c.content)}</div>`
       : '<div class="detail-content" style="color:var(--text-light);font-style:italic;">暂无正文内容</div>'}
     <div class="detail-actions">
-      ${!c.digested ? `<button class="btn btn-primary" onclick="handleDigest('${c.id}');closeDetail()">✅ 我消化完了！</button>` : ''}
+      ${!c.digested ? `<button class="btn btn-primary" onclick="if (handleDigest('${c.id}')) closeDetail()">✅ 已吸收，开孵！</button>` : ''}
+      ${c.url ? `<button class="btn btn-secondary" onclick="openFeedUrl('${c.id}')">🔗打开</button>` : ''}
       ${c.url ? `<button class="btn btn-secondary" onclick="copyToClipboard('${escapeAttr(c.url)}');closeDetail()">🔗复制</button>` : ''}
       ${c.content ? `<button class="btn btn-secondary" onclick="copyToClipboard('${escapeAttr(c.content)}','📋 正文已复制！');closeDetail()">📝复制</button>` : ''}
+      ${c.content ? `<button class="btn btn-secondary" onclick="showFullContent('${c.id}')">📖 全文</button>` : ''}
       <button class="btn btn-danger" onclick="deleteCollection('${c.id}');closeDetail()">️ 删除</button>
     </div>
   `;
@@ -2171,7 +2392,7 @@ function renderPokedex() {
         <div class="pdx-banner-stats">
           <span> 累计消化 <strong>${digestedCount}</strong> 条收藏</span>
           <span>🐣 孵化 <strong>${state.creatures.length}</strong> 只生物</span>
-          <span>🔥 最高连续 <strong>${state.streak}</strong> 天</span>
+          <span>🔥 最高连续 <strong>${state.maxStreak || state.streak}</strong> 天</span>
         </div>
       </div>`;
   }
@@ -2242,10 +2463,21 @@ function escapeAttr(str) {
 
 // ==================== HATCHING ANIMATION ====================
 function handleDigest(id) {
-  const result = digestItem(id);
+  const item = state.collections.find(c => c.id === id);
+  if (!item || item.digested) {
+    showToast('😅 这条已经消化过了');
+    return false;
+  }
+  const noteInput = prompt('用一句话记录你消化到了什么。\n可留空，点“确定”继续孵化；点“取消”放弃本次消化。');
+  if (noteInput === null) {
+    showToast('已取消消化');
+    return false;
+  }
+  const digestNote = noteInput.trim();
+  const result = digestItem(id, digestNote);
   if (!result) {
     showToast('😅 这条已经消化过了');
-    return;
+    return false;
   }
 
   const { creature, isDuplicate } = result;
@@ -2270,6 +2502,7 @@ function handleDigest(id) {
 
   renderAll();
   showHatchAnimation(creature, isDuplicate);
+  return true;
 }
 
 // ==================== CONFETTI ANIMATION ====================
@@ -2349,6 +2582,7 @@ function showCreatureCard(creature) {
   const rarityEl = document.getElementById('hatchRarity');
   const nameEl = document.getElementById('hatchName');
   const descEl = document.getElementById('hatchDesc');
+  const commentEl = document.getElementById('hatchComment');
   const repeatEl = document.getElementById('hatchRepeat');
 
   creatureEl.style.display = 'block';
@@ -2363,13 +2597,21 @@ function showCreatureCard(creature) {
   nameEl.textContent = creature.name;
   descEl.style.display = 'block';
   descEl.textContent = creature.desc;
+  const comment = typeof creature.comment === 'string' ? creature.comment.trim() : '';
+  if (comment) {
+    commentEl.style.display = 'block';
+    commentEl.textContent = comment;
+  } else {
+    commentEl.style.display = 'none';
+    commentEl.textContent = '';
+  }
 
   // 计算累计喂养值
   const feedCount = state.creatures.filter(c => c.key === creature.key).length;
   const totalFeedValue = feedCount * 15;
   if (feedCount > 1) {
     repeatEl.style.display = 'block';
-    repeatEl.innerHTML = `🫘 累计喂养 +${totalFeedValue}`;
+    repeatEl.innerHTML = `🫘 累计加餐 +${totalFeedValue}`;
   } else {
     repeatEl.style.display = 'none';
   }
@@ -2443,16 +2685,21 @@ function doEliminate() {
     return;
   }
 
-  // 随机挑3张多余卡片
+  let removeCount = 3;
+  if (surplus.length >= 9 && confirm(`当前有 ${surplus.length} 张可消除重复卡。是否批量消除？取消则只消除 3 张。`)) {
+    removeCount = Math.floor(surplus.length / 3) * 3;
+  }
+
+  // 随机挑多余卡片，抽中后移出池子，避免重复抽同一张
   const toRemove = [];
   const pool = [...surplus];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < removeCount; i++) {
     const idx = Math.floor(Math.random() * pool.length);
     toRemove.push(pool[idx]);
     pool.splice(idx, 1);
   }
 
-  // 从 state.creatures 中移除这3张（按实例引用移除）
+  // 从 state.creatures 中移除选中的重复卡（按实例引用移除）
   const removeIds = new Set(toRemove.map(c => c.id));
   const oldCreatures = [...state.creatures];
   state.creatures = state.creatures.filter(c => !removeIds.has(c.id));
@@ -2472,11 +2719,11 @@ function doEliminate() {
   overlay.classList.add('hidden');
   hatchBox.classList.remove('flipped');
 
-  showEliminateResult(fact);
+  showEliminateResult(fact, removeCount);
   renderAll();
 }
 
-function showEliminateResult(fact) {
+function showEliminateResult(fact, removedCount = 3) {
   const overlay = document.getElementById('hatchOverlay');
   const hatchBox = document.getElementById('hatchBox');
   hatchBox.classList.remove('flipped');
@@ -2485,6 +2732,7 @@ function showEliminateResult(fact) {
   const rarityEl = document.getElementById('hatchRarity');
   const nameEl = document.getElementById('hatchName');
   const descEl = document.getElementById('hatchDesc');
+  const commentEl = document.getElementById('hatchComment');
   const repeatEl = document.getElementById('hatchRepeat');
 
   creatureEl.style.display = 'block';
@@ -2494,8 +2742,12 @@ function showEliminateResult(fact) {
   nameEl.textContent = '消消乐成功！';
   descEl.style.display = 'block';
   descEl.textContent = fact;
+  commentEl.style.display = 'none';
+  commentEl.textContent = '';
   repeatEl.style.display = 'block';
-  repeatEl.innerHTML = '🔥 3张重复卡已消除';
+  repeatEl.textContent = removedCount > 3
+    ? `🔥 已批量消除 ${removedCount} 张重复卡`
+    : '🔥 3张重复卡已消除';
 
   overlay.classList.remove('hidden');
 
@@ -2514,6 +2766,7 @@ function showHatchAnimation(creature, isDuplicate) {
   const rarityEl = document.getElementById('hatchRarity');
   const nameEl = document.getElementById('hatchName');
   const descEl = document.getElementById('hatchDesc');
+  const commentEl = document.getElementById('hatchComment');
   const repeatEl = document.getElementById('hatchRepeat');
   const box = document.getElementById('hatchBox');
 
@@ -2528,6 +2781,8 @@ function showHatchAnimation(creature, isDuplicate) {
   rarityEl.style.display = 'none';
   nameEl.style.display = 'none';
   descEl.style.display = 'none';
+  commentEl.style.display = 'none';
+  commentEl.textContent = '';
   repeatEl.style.display = 'none';
   box.querySelectorAll('.sparkle').forEach(s => s.remove());
 
@@ -2556,11 +2811,19 @@ function showHatchAnimation(creature, isDuplicate) {
     nameEl.textContent = creature.name;
     descEl.style.display = 'block';
     descEl.textContent = creature.desc;
+    const comment = typeof creature.comment === 'string' ? creature.comment.trim() : '';
+    if (comment) {
+      commentEl.style.display = 'block';
+      commentEl.textContent = comment;
+    } else {
+      commentEl.style.display = 'none';
+      commentEl.textContent = '';
+    }
 
     // 重复提示
     if (isDuplicate) {
       repeatEl.style.display = 'block';
-      repeatEl.textContent = '🫘 已拥有，喂养 +15';
+      repeatEl.textContent = '🫘 又见面了，加餐 +15';
     }
 
     // 翻转卡片显示背面
@@ -2659,6 +2922,74 @@ function handleSkip() {
   }
 }
 
+function handleExportBackup() {
+  try {
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `feedhatch-backup-${todayStr()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast('导出成功');
+  } catch (e) {
+    alert('导出失败，请稍后重试');
+  }
+}
+
+function handleImportBackupFile(event) {
+  const input = event.target;
+  const file = input.files && input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed) ||
+          !Array.isArray(parsed.collections) || !Array.isArray(parsed.creatures)) {
+        alert('备份文件无效');
+        return;
+      }
+      const importCollectionsCount = parsed.collections.length;
+      const importCreaturesCount = parsed.creatures.length;
+      const currentCollectionsCount = state.collections.length;
+      const currentCreaturesCount = state.creatures.length;
+      if (!confirm(
+        `将导入备份数据：\n` +
+        `收藏：${importCollectionsCount} 条\n` +
+        `生物：${importCreaturesCount} 只\n\n` +
+        `当前本地数据：\n` +
+        `收藏：${currentCollectionsCount} 条\n` +
+        `生物：${currentCreaturesCount} 只\n\n` +
+        `⚠️ 导入会覆盖当前本地数据，是否继续？`
+      )) return;
+
+      const oldState = state;
+      state = { ...getDefaultState(), ...parsed };
+      if (!saveState(state)) {
+        state = oldState;
+        alert('导入失败，本地存储空间可能已满，请清理后重试。');
+        return;
+      }
+      renderAll();
+      showToast('导入成功');
+    } catch (e) {
+      alert('备份文件无效');
+    } finally {
+      input.value = '';
+    }
+  };
+  reader.onerror = () => {
+    alert('备份文件无效');
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
 function handleClearAll() {
   if (state.collections.length === 0) {
     showToast(' 粮仓已经是空的了');
@@ -2690,17 +3021,27 @@ function addCollection() {
   const urlInput = document.getElementById('inputUrl');
   const contentInput = document.getElementById('inputContent');
   const title = titleInput.value.trim();
+  const rawUrl = urlInput.value.trim();
+  const normalizedUrl = rawUrl ? normalizeUrl(rawUrl) : '';
+  const oldFeedId = state.todayFeedId;
+  const oldFeedDate = state.todayFeedDate;
+  const oldSkips = state.skipsUsedToday;
 
   if (!title) {
     showToast('赏个标题吧~');
     titleInput.focus();
     return;
   }
+  if (rawUrl && !normalizedUrl) {
+    showToast('⚠️ 没识别到有效链接，请检查后再保存');
+    urlInput.focus();
+    return;
+  }
 
   const collection = {
     id: genId(),
     title,
-    url: urlInput.value.trim(),
+    url: normalizedUrl,
     content: contentInput.value.trim(),
     platform: selectedPlatform,
     addedAt: new Date().toISOString(),
@@ -2718,8 +3059,9 @@ function addCollection() {
   if (!saveState(state)) {
     // 回滚
     state.collections.pop();
-    state.todayFeedId = null;
-    state.todayFeedDate = '';
+    state.todayFeedId = oldFeedId;
+    state.todayFeedDate = oldFeedDate;
+    state.skipsUsedToday = oldSkips;
     alert('⚠️ 保存失败！存储空间可能已满，请清理一些收藏后重试。');
     return;
   }
@@ -2735,17 +3077,19 @@ function deleteCollection(id) {
   const oldCollections = [...state.collections];
   const oldFeedId = state.todayFeedId;
   const oldFeedDate = state.todayFeedDate;
+  const oldSkips = state.skipsUsedToday;
   state.collections = state.collections.filter(c => c.id !== id);
   if (state.todayFeedId === id) {
     state.todayFeedId = null;
     state.todayFeedDate = '';
-    pickTodayFeed();
+    state.skipsUsedToday = 0;
   }
   if (!saveState(state)) {
     // 回滚
     state.collections = oldCollections;
     state.todayFeedId = oldFeedId;
     state.todayFeedDate = oldFeedDate;
+    state.skipsUsedToday = oldSkips;
     alert('⚠️ 保存失败！存储空间可能已满，请清理一些收藏后重试。');
     return;
   }
@@ -2755,6 +3099,11 @@ function deleteCollection(id) {
 
 // ==================== EVENT BINDINGS ====================
 document.getElementById('btnAdd').addEventListener('click', addCollection);
+document.getElementById('btnExportBackup').addEventListener('click', handleExportBackup);
+document.getElementById('btnImportBackup').addEventListener('click', () => {
+  document.getElementById('backupFileInput').click();
+});
+document.getElementById('backupFileInput').addEventListener('change', handleImportBackupFile);
 document.getElementById('inputTitle').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') addCollection();
 });
@@ -2798,25 +3147,13 @@ function renderCheckinHistory() {
   const container = document.getElementById('checkinHistoryContent');
   const digestedItems = state.collections.filter(c => c.digested && c.digestedAt);
 
-  if (digestedItems.length === 0) {
-    container.innerHTML = `
-      <div style="text-align:center;padding:24px 0;color:var(--text-light);">
-        <div style="font-size:48px;margin-bottom:12px;">📭</div>
-        <p>还没有打卡记录</p>
-        <p style="font-size:12px;margin-top:4px;">消化一条收藏，开始你的打卡之旅吧！</p>
-      </div>`;
-    return;
-  }
-
-  // Group by date
-  const byDate = {};
+  const countByDate = {};
   digestedItems.forEach(item => {
-    const date = item.digestedAt.split('T')[0];
-    if (!byDate[date]) byDate[date] = [];
-    byDate[date].push(item);
+    const date = typeof item.digestedAt === 'string' ? item.digestedAt.split('T')[0] : '';
+    if (date) countByDate[date] = (countByDate[date] || 0) + 1;
   });
 
-  const sortedDates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+  const recentDates = Array.from({ length: 7 }, (_, i) => daysAgoToDateStr(i));
 
   container.innerHTML = `
     <div style="margin-bottom:16px;padding:12px;background:var(--card2);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:space-around;">
@@ -2829,6 +3166,14 @@ function renderCheckinHistory() {
         <div style="font-size:13px;color:var(--text-light);margin-bottom:4px;">最高纪录</div>
         <div style="font-size:28px;font-weight:800;color:var(--accent);">${state.maxStreak || state.streak} 天</div>
       </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${recentDates.map(date => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);">
+          <span style="font-size:13px;color:var(--text);font-weight:600;">${date}</span>
+          <span style="font-size:13px;color:var(--text-light);">${countByDate[date] || 0} 次</span>
+        </div>
+      `).join('')}
     </div>`;
 }
 
